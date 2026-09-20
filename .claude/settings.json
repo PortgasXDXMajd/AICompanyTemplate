@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(python3 scripts/*)",
       "Bash(git -C worktrees/*)",
       "Bash(herdr tab create *)",
       "Bash(herdr tab close *)",

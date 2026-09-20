@@ -30,7 +30,7 @@ The **Chief of Staff**, because the check needs helper subagents and may need th
 
 ## Steps
 
-1. **Scope.** `git -C <worktree> diff --stat <base>...HEAD`, where the worktree is `worktrees/<project>/<employee>--<slug>`. If base was not given, use `git -C <worktree> merge-base HEAD <default branch>` and say so in the log line. Find the spec: a plan names it under "Why this matters". A plan that came from an audit has no spec, and the plan stands in for it everywhere below. Then:
+1. **Scope.** `python3 scripts/worktree.py status <worktree> --base <base>` shows the commits and the diffstat; `git -C <worktree> diff --stat <base>...HEAD` lists the files. The worktree and the base are on the job's board row. If the base is missing, the script falls back to the merge-base with the default branch: say so in the log line. Find the spec: a plan names it under "Why this matters". A plan that came from an audit has no spec, and the plan stands in for it everywhere below. Then:
    - No source code changed (docs, config, copy): log `refinement check: skipped, no code` and stop.
    - Under about 40 changed source lines and no new file: run part A only.
    - The spec says `Refinement: part A only`: run part A only.

@@ -7,7 +7,7 @@ It is plain markdown plus native Claude Code features (`CLAUDE.md`, subagents, s
 ## Quickstart
 
 1. Click **Use this template** on GitHub and create your own (private) company repo, then clone it.
-2. `cd` into it and run `claude`.
+2. `cd` into it, run `python3 scripts/preflight.py` to see what your machine is missing, then run `claude`.
 3. Say hello. The session sees the company is not onboarded and starts the onboarding interview (`/onboard`). It grills you in rounds, each question with a recommended answer, and pushes back on vague ones. That is the point.
 4. When onboarding ends you have a filled `context/company.md`, a `ROADMAP.md` with one measurable goal, and a recommendation for your next hire. If you build software you also have your first employee (the Senior Technical Adviser), your first product repo under `projects/`, with a `CLAUDE.md` recording the tech stack you chose, and your coding rules in `context/engineering.md`.
 
@@ -25,7 +25,7 @@ claude --agent growth-marketer
 
 **Your first employee comes with your first software project.** The Senior Technical Adviser runs on the newest Fable model at maximum effort and works by shadcn's `improve` skill: it reads the codebase, audits it, and turns approved specs into executor-ready plans in `plans/<project>/`, one per task and employee. It never writes code. Everyone else is hired when recurring work needs an owner, and runs on the newest Opus model:
 
-```
+```text
 /hire growth marketer
 ```
 
@@ -37,7 +37,7 @@ The hire skill makes you justify the role, drafts the job description, and creat
 
 ## Layout
 
-```
+```text
 CLAUDE.md          Operating manual every session loads
 ROADMAP.md         One goal, then Now / Next / Later
 REVIEW.md          Quality bar and review process
@@ -53,11 +53,12 @@ projects/          Product repos, cloned here, tracked in their own GitHub repos
 worktrees/         One git worktree per running employee (gitignored)
 .claude/agents/    Employees
 .claude/skills/    Company procedures (onboard, hire, new-project, feature, delegate, worktree,
-                   job-status, refinement-check, qa-check), plus third-party skills
+                   job-status, refinement-check, qa-check, doctor), plus third-party skills
                    installed with `npx skills`
+scripts/           The deterministic plumbing the skills call (Python, standard library only)
 .claude/settings.json  Makes Claude Code ask you before a push, a GitHub repo operation,
-                   or an edit to a product's main checkout; allows git inside worktrees
-                   and the Herdr commands delegation uses
+                   or an edit to a product's main checkout; allows the scripts, git inside
+                   worktrees, and the Herdr commands delegation uses
 skills-lock.json   Versions of the third-party skills
 ```
 
@@ -87,10 +88,25 @@ cd /path/to/company && herdr                    # then run `claude` in the first
 
 Inside Herdr the Chief of Staff delegates by opening a tab per employee (and per review helper), starting `claude --agent <employee>` in it, and waiting for the hand-back. When an employee needs an approval, its tab shows as blocked and the Chief of Staff tells you which one; it never answers approvals for you. Outside Herdr the same delegations run as in-process subagents. The `delegate` skill covers both.
 
+## Scripts
+
+Skills decide and judge; scripts do the repeatable plumbing the same way every time, so it does not depend on a model retyping git or Herdr commands correctly. They are plain Python 3 with no dependencies, in `scripts/` (`scripts/README.md` has the full table):
+
+| Script | In one line |
+| --- | --- |
+| `preflight.py` | Is this machine and repo ready? |
+| `job.py`, `journal.py`, `status.py` | The flight recorder: job folders, the board, the journal, and the report a new session starts from |
+| `worktree.py` | Create, check, update, merge and remove employee worktrees, with every guard built in |
+| `agent.py` | Start an employee or a helper in its own Herdr tab, prompt it, wait for it, read it, close it |
+| `project.py`, `team.py` | Product repos and their registry; role files and the roster |
+| `skills.py`, `qa_probe.py`, `doctor.py` | Third-party skills; what hands-on QA can run here; a consistency check of the whole repo |
+
+Pushes, GitHub repo creation and PR merges are deliberately **not** in any script: those commands run in the open so Claude Code's permission prompt reaches you.
+
 ## Commands
 
 | Command | What it does |
-|---|---|
+| --- | --- |
 | `/onboard` | Interview about product, buyer, pain, promise, goal. Sets up the company. |
 | `/hire <role>` | Justify, define, and create a new employee. |
 | `/new-project <name>` | Grill the tech stack, create a product repo on GitHub with a README and a `CLAUDE.md` recording that stack, clone it into `projects/`. |
@@ -100,6 +116,7 @@ Inside Herdr the Chief of Staff delegates by opening a tab per employee (and per
 | `/thermo-nuclear-code-quality-review` | Strict maintainability review of the current branch's changes. |
 | `/job-status`, or "what is happening?" | Rebuilds the state of every job from disk and recommends what to resume, restart, review or drop. |
 | `/qa-check <job>` | Runs the product and uses it like a customer: real browser, emulator or simulator. |
+| `/doctor` | Checks the machine and the repo for inconsistencies (`preflight.py`, `doctor.py`). |
 | "run the daily standup" | Executes `routines/daily-standup.md`. |
 | "close the day" | Executes `routines/end-of-day.md`: settles the job board, distils the day's lessons, prunes and updates every `CLAUDE.md` (you approve the edits). |
 | "run the weekly review" | Executes `routines/weekly-review.md`. |
@@ -122,7 +139,7 @@ Routines are interactive in v1: they end with decisions that need you. Unattende
 Eight third-party skills are vendored into `.claude/skills/` and pinned in `skills-lock.json`. Five come from [mattpocock/skills](https://github.com/mattpocock/skills), one each from [cursor/plugins](https://github.com/cursor/plugins), [shadcn/improve](https://github.com/shadcn/improve) and [herdrdev/herdr](https://github.com/herdrdev/herdr) (Apache-2.0; the others are MIT):
 
 | Skill | Used for |
-|---|---|
+| --- | --- |
 | `grilling` | The interview method behind `/onboard`, `/new-project` and `/feature` |
 | `tdd` | How every developer builds: test-first, in vertical slices |
 | `herdr` | The Herdr CLI reference behind `delegate`'s one-tab-per-employee mode |
@@ -134,6 +151,7 @@ Eight third-party skills are vendored into `.claude/skills/` and pinned in `skil
 They were installed with:
 
 ```bash
+python3 scripts/skills.py install     # runs these:
 npx skills add https://github.com/mattpocock/skills \
   --skill grilling tdd improve-codebase-architecture codebase-design domain-modeling \
   -a claude-code --copy -y
@@ -143,7 +161,7 @@ npx skills add https://github.com/shadcn/improve --skill improve -a claude-code 
 npx skills add herdrdev/herdr --skill herdr -a claude-code --copy -y
 ```
 
-Update them with `npx skills update`, and read the diff before committing: skills are instructions your employees will follow. Do not edit them in place. Company-specific behaviour goes in the wrapper skills (`onboard`, `new-project`, `feature`, `delegate`, `refinement-check`), so updates never clobber it.
+Update them with `python3 scripts/skills.py update` (`npx skills update`), and read the diff before committing: skills are instructions your employees will follow. Do not edit them in place. Company-specific behaviour goes in the wrapper skills (`onboard`, `new-project`, `feature`, `delegate`, `refinement-check`), so updates never clobber it.
 
 **The refinement check.** After every code implementation, and before any feature branch is pushed or merged, the Chief of Staff runs `refinement-check`: two fresh subagents review the change with the code quality and architecture skills. Inside Herdr those helpers are tabs too. Problems contained in the change are fixed on the branch. Wider ones are logged in `work/engineering/refinement-candidates.md` and brought to you.
 

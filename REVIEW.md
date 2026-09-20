@@ -19,7 +19,7 @@ Before you hand anything back, check:
 
 Required when the work will be seen outside the company, changes a product repo, or sets direction (positioning, pricing). Three exceptions: an edit to a project's `CLAUDE.md` from the end-of-day routine is reviewed by the CEO approving the diff; and specs and plans: the grilling that produced a spec is its review, and a plan is held to the quality bar in the `improve` skill's plan template.
 
-The Chief of Staff hands the output to a **fresh helper (not an employee, and not whoever did the work)**, giving it only: this file, the spec or brief, the plan if the work executed one, the job's `progress.md` and hand-back, and the output. When there is a plan, its done criteria are the definition of done for question 1; the spec is context, and spec conditions assigned to other plans are not failures. For code it also gets `context/engineering.md`, the project's `CLAUDE.md`, the `tdd` skill's path, and the worktree path, base and branch. The reviewer did not see the reasoning, so it judges the result the way a customer or the CEO would. It changes nothing and writes `review.md`, ending in a `Verdict:` line. Set the board row to `in-review` first.
+The Chief of Staff hands the output to a **fresh helper (not an employee, and not whoever did the work)**, giving it only: this file, the spec or brief, the plan if the work executed one, the job's `progress.md` and hand-back, and the output. When there is a plan, its done criteria are the definition of done for question 1; the spec is context, and spec conditions assigned to other plans are not failures. For code it also gets `context/engineering.md`, the project's `CLAUDE.md`, the `tdd` skill's path, and the worktree path, base and branch. The reviewer did not see the reasoning, so it judges the result the way a customer or the CEO would. It changes nothing and writes `review.md`, ending in a `Verdict:` line. Set the board row first: `python3 scripts/job.py set <job-id> --state in-review --next "independent review"` (inside Herdr, `agent.py start --helper` does it).
 
 The reviewer answers:
 
@@ -47,12 +47,12 @@ A feature branch is not pushed, merged, or reported as done until sections 2 to 
 
 ## 5. Handing work to the CEO
 
-Write the hand-off to `jobs/<job-id>/handoff.md` and set the board row to `awaiting-merge` before you present it, so a new session knows what the CEO was asked. Lead with the result, then what the CEO needs to decide. Format:
+Write the hand-off to `jobs/<job-id>/handoff.md` and run `python3 scripts/job.py set <job-id> --state awaiting-merge` before you present it, so a new session knows what the CEO was asked. Lead with the result, then what the CEO needs to decide. Format:
 
 - **Done:** what now exists, with file paths or a demo link.
 - **Checked:** how it was verified: the reviewer's verdict, the refinement check line, and the QA result with its evidence.
 - **Not done / risks:** anything cut, unverified, or uncertain. Be specific.
-- **Needs you:** decisions or approvals required, each as a question with a recommendation. For code this always includes whether to merge `<branch>` into the default branch. After the CEO's yes, the Chief of Staff merges and removes the worktree (`worktree` skill).
+- **Needs you:** decisions or approvals required, each as a question with a recommendation. For code this always includes whether to merge `<branch>` into the default branch. After the CEO's yes: `python3 scripts/worktree.py merge <worktree> --title "..." --approved-by-ceo`, `worktree.py remove <worktree>`, then `python3 scripts/job.py close <job-id> --outcome merged --log "..."`.
 
 Keep it short. The CEO can open the files. For specced work the Chief of Staff also adds the entry in `demos/`, from the QA evidence and the hand-back.
 

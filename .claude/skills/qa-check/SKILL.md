@@ -20,20 +20,17 @@ The tools decide who can do this:
 | Mobile app (native, React Native, Flutter, Expo) | **Maestro** on an Android emulator or iOS simulator: `claude mcp add maestro -- maestro mcp` (needs Java 17+). iOS simulators exist only on macOS with Xcode. | Android without Maestro: `adb` (`uiautomator dump` for element bounds, `input tap`, `exec-out screencap -p`). Responsive web or PWA target: browser device emulation, reported as "web-emulated, not device-verified". |
 | API, CLI, background job | Call it for real: `curl`, the CLI binary, a script. | none needed |
 
-- Inside Herdr, start a QA helper in its own tab with the `delegate` skill, using the `--chrome` start line, so the browser tools are in that session and the CEO can watch. Brief: this file, the plan's QA section or the spec's definition of done, the worktree path, and how to run the product (from the developer's hand-back).
+- Inside Herdr, start a QA helper in its own tab with the `delegate` skill (`python3 scripts/agent.py start --job <job-id> --helper qa --chrome`), so the browser tools are in that session and the CEO can watch. Brief: this file, the plan's QA section or the spec's definition of done, the worktree path, and how to run the product (from the developer's hand-back).
 - In a plain terminal, the Chief of Staff runs QA itself in its own session if that session has the browser tools, or delegates to a helper subagent when only Playwright or Maestro (MCP servers, available to subagents) are needed.
 - The project's `CLAUDE.md` names the QA tooling the CEO chose ("Hands-on QA" row). Use that.
 
 Probe before you promise anything:
 
 ```bash
-# web
-claude mcp list                      # is playwright (or maestro) configured? For Chrome, look for mcp__claude-in-chrome__* in your own tool list
-# mobile
-maestro --version; java -version
-emulator -list-avds; adb devices; emulator -accel-check
-xcrun simctl list devices            # macOS only
+python3 scripts/qa_probe.py          # Playwright and Maestro MCP servers, Maestro, Java, adb, emulators and acceleration, devices, iOS simulators
 ```
+
+It ends with what web QA and mobile QA can use on this machine. Claude in Chrome cannot be probed from a script: look for `mcp__claude-in-chrome__*` in your own tool list.
 
 An MCP server added now is only available after the session restarts; the job system survives that. No hardware acceleration (`emulator -accel-check` fails) and no device in `adb devices`: mobile QA is not possible on this machine. Never boot an unaccelerated emulator; offer a USB device or a run on the CEO's Mac instead.
 
@@ -41,7 +38,7 @@ An MCP server added now is only available after the session restarts; the job sy
 
 ## Steps
 
-1. **Run it from the worktree**, not the main checkout: install, then start it with the project's run command as a background process. Wait until it answers (poll the URL, or `adb shell getprop sys.boot_completed` for an emulator; do not sleep for a fixed time, and give up after five minutes). Mobile: boot the emulator or simulator (`maestro start-device --platform android|ios`, or `emulator -avd <name>`, add `-no-window` on a machine without a display), build and install a development build. Expo Go cannot run custom native code and cannot be launched by app id, so prefer `npx expo run:android` / `run:ios`.
+1. **Run it from the worktree**, not the main checkout: install, then start it with the project's run command as a background process. Wait until it answers with `python3 scripts/qa_probe.py wait-url <url>` (it polls and gives up after five minutes), or poll `adb shell getprop sys.boot_completed` for an emulator; never sleep for a fixed time. Mobile: boot the emulator or simulator (`maestro start-device --platform android|ios`, or `emulator -avd <name>`, add `-no-window` on a machine without a display), build and install a development build. Expo Go cannot run custom native code and cannot be launched by app id, so prefer `npx expo run:android` / `run:ios`.
 2. **Walk the flows** from the plan's QA section, or derive them from the definition of done. At minimum: the happy path from a cold start as a first-time user; one way it can fail (bad input, empty form, no network, wrong password); the empty state before any data exists; and coming back to it (reload, reopen the app).
 3. **Look under the surface.** Web: console errors and failed network requests on every page you touch. Mobile: `adb logcat` or the simulator's crash logs. An API: status codes and error bodies for bad input.
 4. **Look at it on more than one size.** Web: a phone width (about 375 px) and a desktop width; resize the window and take a screenshot of each key screen. Mobile: one small and one large device if both are available.

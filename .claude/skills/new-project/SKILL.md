@@ -12,7 +12,7 @@ Input from the CEO: $ARGUMENTS
 
 **Precondition.** If `context/company.md` says `STATUS: NOT ONBOARDED`, stop and run `onboard` first. Onboarding calls this skill at the right moment.
 
-Run every command from the HQ repo root. Use `git -C projects/<name> ...` instead of `cd`, so later HQ commits do not land in the product repo.
+Run every command from the HQ repo root. `scripts/project.py` does the local plumbing; use `git -C projects/<name> ...` instead of `cd` for anything else, so later HQ commits do not land in the product repo.
 
 ## 1. Settle the details
 
@@ -41,13 +41,13 @@ Close with one playback: name, owner, visibility, the filled stack table, and, i
 ## 3. Create the repo (new repo only)
 
 ```bash
-mkdir -p projects/<name>
-git -C projects/<name> init -b main
+python3 scripts/project.py init <name>        # validates the name, creates projects/<name> as an empty repo on main
 # write projects/<name>/README.md and projects/<name>/CLAUDE.md (content below)
-git -C projects/<name> add README.md CLAUDE.md
-git -C projects/<name> commit -m "Initial commit: README and CLAUDE.md with tech stack"
+python3 scripts/project.py commit <name>      # first commit of those two files
 gh repo create <owner>/<name> --<visibility> --source projects/<name> --remote origin --push
 ```
+
+`gh repo create` is not inside the script on purpose: run it yourself, so Claude Code asks the CEO.
 
 Two files only. Claude Code will ask the CEO to approve each write, because `.claude/settings.json` guards product main checkouts; that is expected here, so do not route around it with a shell command. `CLAUDE.md` is `project-claude-template.md` filled in with the stack from step 2. The README stays honest about the stage:
 
@@ -76,15 +76,14 @@ gh auth login
 gh repo create <owner>/<name> --<visibility> --source projects/<name> --remote origin --push
 ```
 
-When the CEO says it is done, verify with `git -C projects/<name> remote -v`, then set the registry row to `active` with the URL.
+When the CEO says it is done, verify with `git -C projects/<name> remote -v`, then run `project.py register` again with `--status active`.
 
 Then go to step 5.
 
 ## 4. Register an existing repo (existing repo only)
 
 ```bash
-gh repo clone <owner>/<name> projects/<name>
-# without gh: git clone <url> projects/<name>
+python3 scripts/project.py clone <owner>/<name or URL> [<name>]    # uses gh, falls back to git clone
 ```
 
 Read its README and its `CLAUDE.md` if present, so the purpose line in the registry is accurate.
@@ -95,13 +94,13 @@ Before step 5, two things the new-repo path covers in step 2: if `.claude/agents
 
 ## 5. Make sure the Senior Technical Adviser exists (software projects only)
 
-If `.claude/agents/senior-technical-adviser.md` is missing, then with the CEO's yes from step 2 or step 4, copy `senior-technical-adviser.md` (next to this file) there unchanged. Do not lower its `model: fable` or `effort: max`: the CEO's standing rule is that the adviser always runs on the newest Fable model at maximum effort. Add its row to `context/team.md` (owns `plans/`; reach it by delegation or `claude --agent senior-technical-adviser`) and note the hire in `context/decisions.md`. Claude Code picks up the new file within a few seconds. One adviser serves every project, so skip this step if the file is already there.
+If `.claude/agents/senior-technical-adviser.md` is missing, then with the CEO's yes from step 2 or step 4, run `python3 scripts/team.py add-adviser`. It copies `senior-technical-adviser.md` (next to this file) there unchanged and adds the roster row. Do not lower its `model: fable` or `effort: max`: the CEO's standing rule is that the adviser always runs on the newest Fable model at maximum effort. Note the hire in `context/decisions.md`. Claude Code picks up the new file within a few seconds. One adviser serves every project, so skip this step if the file is already there.
 
 ## 6. Record it
 
-1. Add a row to the registry in `projects/README.md`: name, `owner/name` linked to the GitHub URL, purpose, status, today's date. Status values are listed in that file.
+1. Add or update the registry row: `python3 scripts/project.py register <name> --repo <owner>/<name> --purpose "<one line>" --status <active|local only|paused|archived>`.
 2. If this is the main product, mention it under Product in `context/company.md`.
-3. Append a line to `context/log.md`.
+3. Note it in the journal: `python3 scripts/journal.py add "project <name> set up"`.
 4. Commit the HQ files you changed, by path, with the message `Add project <name>`: `projects/README.md`, `context/log.md`, and `context/company.md`, `context/engineering.md`, `context/team.md`, `context/decisions.md` or `.claude/agents/senior-technical-adviser.md` if touched. During onboarding, skip this commit: onboarding commits everything at the end.
 
 ## 7. Put the adviser to work

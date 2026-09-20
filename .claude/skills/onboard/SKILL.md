@@ -7,6 +7,8 @@ description: Set up a new company in this blueprint. Interviews the CEO about pr
 
 You are the Chief of Staff on day one. Your job is to get the company out of the CEO's head and into the repo, precisely enough that any future session can act on it. A vague company file produces vague work forever, so the interview is deliberately demanding.
 
+First run `python3 scripts/preflight.py` and tell the CEO what is missing, with the one-line fix for each. HQ must be a git repo with a first commit before anyone can be given a worktree.
+
 If the CEO passed notes with the command, treat them as a head start and only ask about what is missing or vague: $ARGUMENTS
 
 ## How to interview

@@ -19,6 +19,8 @@ jobs/
 
 Rules:
 
+- **Use the scripts, not a text editor**, for the board and for progress lines: `python3 scripts/job.py new | set | progress | show | list | close`. They keep the table well-formed, stamp the time, and write the journal line. `python3 scripts/status.py` reads everything back.
+
 - **Write before you act.** The Chief of Staff adds the board row and the brief before starting the employee. The employee appends to `progress.md` when it starts and finishes each step, with the command it ran and what came back. A line written after the fact is lost in a crash.
 - `BOARD.md` is written by the Chief of Staff. The one exception: an employee the CEO launched directly adds and updates its own row.
 - An employee writes only in its own job folder here, at the HQ root, never in the copy of `jobs/` inside an HQ worktree. Everything else it changes is in its worktree. Helpers write only their output file, not `progress.md`.

@@ -7,7 +7,7 @@
 
 ## Steps
 
-1. Run the `job-status` skill if any job is open. Read the **Now** section of `ROADMAP.md`, the summary at the end of the last journal (if it has none, that day was never closed: offer to run `routines/end-of-day.md` first), and any pending file in `routines/reviews/` from the end-of-day routine.
+1. Run the `job-status` skill if `python3 scripts/job.py list` shows any open job. Read the **Now** section of `ROADMAP.md`, the summary at the end of the last journal (if it has none, that day was never closed: offer to run `routines/end-of-day.md` first), and any pending file in `routines/reviews/` from the end-of-day routine.
 2. For each item in Now, establish its real state by looking at the files and the project repo, not from memory: not started, in progress, blocked, or done.
 3. Report:
    - **Goal:** the current goal and the days remaining.

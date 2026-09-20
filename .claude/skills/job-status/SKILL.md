@@ -9,33 +9,29 @@ The CEO must never have to re-explain anything. Everything needed is on disk: re
 
 ## 1. Read the record
 
-- `jobs/BOARD.md`: every open job and its last known state.
-- The newest file in `context/journal/` (and the one before it if today's is short): the last things the Chief of Staff did and was about to do. The last entries tell you what was in flight when the previous session ended.
+- `python3 scripts/job.py list`: every open job and its last known state.
+- `python3 scripts/journal.py tail -n 60` (and the file before it if today's is short): the last things the Chief of Staff did and was about to do. The last entries tell you what was in flight when the previous session ended.
 - `ROADMAP.md` (already in context) and the last 20 lines of `context/log.md`.
 
 ## 2. Check each open job against reality
 
-The board says what was believed. Find out what is true:
+The board says what was believed. One script collects what is true:
 
 ```bash
-ls jobs/<job-id>/                                  # brief, progress, handback, review files?
-tail -n 30 jobs/<job-id>/progress.md               # how far did it get, what was it doing last?
-git worktree list; git -C projects/<project> worktree list
-git -C <worktree> status --short                   # uncommitted work?
-git -C <worktree> log --oneline <base>..HEAD       # what was committed?
-git -C <repo> branch --merged <default-branch>     # was this job's branch already merged?
+python3 scripts/status.py            # add --json for the raw facts
 ```
 
-A review step counts as done only when its file ends in a `Verdict:` line (`review.md`, `quality.md`, `architecture.md`, `qa.md`, and `-2` files for re-checks). Read the verdict: "pass with fixes" with no fix brief after it means the fixes were never started. A file without a verdict line was cut off mid-write. `handoff.md` holds what the CEO was last asked about this job.
+For every open job it reports the files in the job folder, the verdict line of each review file, the last progress lines and how old they are, whether the worktree exists, commits since the base, uncommitted files, whether the branch is already merged, an open fix round, and, inside Herdr, whether the runner and any helpers (`rev-`, `qual-`, `arch-`, `qa-`) are still alive. It also lists stray worktrees, board rows whose worktree is gone, job folders that are neither on the board nor closed, and the end of the journal. Each job gets a **suggested** verdict. It is a suggestion: you read the evidence and decide.
 
-Is anyone still working on it?
+Dig deeper where the report is not enough: `python3 scripts/job.py show <job-id>`, `python3 scripts/worktree.py status <worktree> --base <base>`, `git -C <worktree> diff <base>...HEAD`, and inside Herdr `python3 scripts/agent.py read <agent-name>`.
 
-- Inside Herdr (`test "${HERDR_ENV:-}" = 1`): `herdr agent list`, then `herdr agent get <agent-name>` for the runner named on the board, and for any helper named in its Next step (`rev-`, `qual-`, `arch-`, `qa-`). A live helper means wait for it; do not start another. Employee tabs are separate processes and often outlive a dead Chief of Staff session. `working` means it is still running, `blocked` means it is waiting for the CEO in its tab, `idle` or `done` means it stopped.
-- Runner `subagent` or `self`: these die with the session that started them. No hand-back for the current round means the job was interrupted, unless that session is in fact still open in another terminal.
+What the facts mean:
+
+- A review step counts as done only when its file ends in a `Verdict:` line. "pass with fixes" with no fix brief after it means the fixes were never started. A file without a verdict line was cut off mid-write. `handoff.md` holds what the CEO was last asked about this job.
+- Employee tabs in Herdr are separate processes and often outlive a dead Chief of Staff session. `working` means still running, `blocked` means waiting for the CEO in its tab, `idle` or `done` means it stopped. A live helper means wait for it; do not start another.
+- Runner `subagent` or `self` dies with the session that started it. No hand-back for the current round means the job was interrupted, unless that session is in fact still open in another terminal.
 - Runner `direct session`: the CEO ran that employee themselves. It is finished when `handback.md` exists.
 - Before you call anything interrupted: if its last progress line is less than about 15 minutes old, or its runner is `direct session`, ask the CEO whether that session is still open. Two writers in one worktree is worse than waiting.
-
-Also look for strays: worktrees with no board row, job folders with no row and no hand-back, board rows whose worktree is gone.
 
 Last resort, when the journal and the job folders do not explain something: the previous session's transcript is under `~/.claude/projects/` in the folder named after this directory's path, newest `.jsonl` first. Read only its tail. Its format is internal and changes between versions, so treat it as a hint.
 
@@ -74,6 +70,7 @@ End with anything the last session was about to do for the CEO that is not a job
 - **Resume**: write `jobs/<job-id>/resume-N-brief.md`: what was done (from `progress.md` and the commits), what is left, and "continue from here, do not redo finished steps, verify the state of the worktree before you change anything". Run it with the `delegate` skill in the same worktree. If the employee's Herdr tab is still alive and idle, prompt that agent; it still has its context.
 - **Restart from scratch**: keep the old branch until the CEO says to drop it (`worktree` skill, rejected work), then delegate again under a new slug.
 - **Review now**: continue with `REVIEW.md` from the first missing step.
-- **Drop**: remove the worktree, keep or delete the branch as the CEO says, take the row off the board, log it.
+- **Merged, not closed**: `python3 scripts/worktree.py remove <worktree>`, then `python3 scripts/job.py close <job-id> --outcome merged --log "..."`.
+- **Drop**: `python3 scripts/worktree.py remove <worktree> --keep-branch` (delete the branch only if the CEO says so), then `python3 scripts/job.py close <job-id> --outcome dropped --log "why"`.
 
-Update `jobs/BOARD.md` and the journal as you go, before each action.
+Record as you go, before each action: `python3 scripts/job.py set ...` for the board, `python3 scripts/journal.py add "..."` for everything else.

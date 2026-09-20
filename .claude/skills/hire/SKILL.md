@@ -47,8 +47,8 @@ Show the CEO the complete role file. Hiring needs an explicit yes.
 
 ## 4. Create the employee
 
-1. Copy `employee-template.md` (next to this file) to `.claude/agents/<name>.md` and fill every placeholder. Delete guidance comments. Keep the file under about 60 lines: a role file is a job description, and the company context already arrives through `CLAUDE.md`.
-2. Add a row to `context/team.md` with what the employee owns and how to reach it.
+1. Run `python3 scripts/team.py add <name> --owns "<files and folders>"` (add `--developer` for a role that writes code; without it the engineering block is removed). It copies `employee-template.md` to `.claude/agents/<name>.md` with the name set and adds the roster row. Then fill every `<FILL: ...>` placeholder; `python3 scripts/team.py list` shows how many are left, and `python3 scripts/doctor.py` fails while any remain. Delete guidance comments. Keep the file under about 60 lines: a role file is a job description, and the company context already arrives through `CLAUDE.md`.
+2. Check the row the script added to `context/team.md`: what the employee owns is what the Chief of Staff routes by.
 3. Append the hire and its reason to `context/decisions.md`, add a line to `context/log.md`, and commit with `Hire <name>`.
 4. Claude Code picks up a new file in `.claude/agents/` within a few seconds, no restart needed. If delegating to `<name>` still fails after that, ask the CEO to restart `claude`.
 

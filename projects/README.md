@@ -13,4 +13,4 @@ The company's products. Each project is its own GitHub repo, cloned into `projec
 ## Registry
 
 | Name | GitHub repo | Purpose | Status | Created |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
