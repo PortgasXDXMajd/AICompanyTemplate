@@ -15,7 +15,7 @@ Target: $ARGUMENTS
 Both are third-party, vendored in `.claude/skills/`, and marked user-invoked only, so you cannot call them through the Skill tool. Read their `SKILL.md` files and follow them as described here. Never edit them.
 
 | Part | Skill file to read | Looks at |
-|---|---|---|
+| --- | --- | --- |
 | A. Code quality | `.claude/skills/thermo-nuclear-code-quality-review/SKILL.md` | The diff: abstraction quality, spaghetti growth, file sprawl, missed simplifications |
 | B. Architecture | `.claude/skills/improve-codebase-architecture/SKILL.md` | The changed modules and their callers: shallow modules, leaky seams, poor locality |
 

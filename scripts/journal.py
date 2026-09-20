@@ -49,8 +49,7 @@ def main():
     elif args.cmd == "close":
         p = L.journal_path()
         L.journal_add("end of day")
-        with p.open("a") as f:
-            f.write(f"\n{SUMMARY}\n\n{args.text.strip()}\n")
+        L.write_md(p, p.read_text() + f"\n{SUMMARY}\n\n{args.text.strip()}\n")
         print(f"closed {L.rel(p)}")
 
 

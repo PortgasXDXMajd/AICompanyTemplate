@@ -10,15 +10,15 @@ Item format: `- [ ] Outcome, not activity (owner: <employee>, spec: specs/NNN-na
 
 ## Now
 
-_empty_
+_Nothing here yet._
 
 ## Next
 
-_empty_
+_Nothing here yet._
 
 ## Later
 
-_empty_
+_Nothing here yet._
 
 ## Done
 

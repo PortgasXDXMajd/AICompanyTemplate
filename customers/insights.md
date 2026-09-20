@@ -6,12 +6,12 @@ Format: `- Pattern (sources: customers/a.md, customers/b.md, customers/c.md)`
 
 ## Patterns
 
-_none yet_
+_None yet._
 
 ## Early signals
 
-_none yet_
+_None yet._
 
 ## Disproved assumptions
 
-_none yet_
+_None yet._

@@ -21,7 +21,8 @@ AGENTS = L.ROOT / ".claude" / "agents"
 TEAM = L.ROOT / "context" / "team.md"
 TEMPLATE = L.ROOT / ".claude" / "skills" / "hire" / "employee-template.md"
 ADVISER = L.ROOT / ".claude" / "skills" / "new-project" / "senior-technical-adviser.md"
-DEV_BLOCK = re.compile(r"<!-- DEVELOPER ROLES ONLY\..*?-->\n## Engineering rules\n.*?(?=\n## )", re.S)
+DEV_BLOCK = re.compile(r"<!-- DEVELOPER ROLES ONLY\..*?-->\s*## Engineering rules\n.*?(?=\n## )", re.S)
+DEV_MARK = re.compile(r"<!-- DEVELOPER ROLES ONLY\..*?-->\s*", re.S)
 
 
 def roster_add(name, owns, reach):
@@ -35,7 +36,7 @@ def roster_add(name, owns, reach):
     table_end = next((i for i, l in enumerate(lines) if l.strip().startswith("<!--")), len(lines))
     last = max(i for i, l in enumerate(lines[:table_end]) if l.strip().startswith("|"))
     lines.insert(last + 1, row)
-    TEAM.write_text("\n".join(lines) + "\n")
+    L.write_md(TEAM, "\n".join(lines))
     return True
 
 
@@ -56,13 +57,13 @@ def cmd_add(a):
     dest = AGENTS / f"{name}.md"
     if dest.exists():
         L.die(f"{L.rel(dest)} already exists; edit it instead")
-    t = TEMPLATE.read_text().replace("name: <FILL: role-name>", f"name: {name}", 1)
+    t = TEMPLATE.read_text().replace('name: "<FILL: role-name>"', f"name: {name}", 1)
     if not a.developer:
         t = DEV_BLOCK.sub("", t)
     else:
-        t = t.replace("<!-- DEVELOPER ROLES ONLY. Delete this section for non-coding roles. -->\n", "")
+        t = DEV_MARK.sub("", t, count=1)
     AGENTS.mkdir(parents=True, exist_ok=True)
-    dest.write_text(t)
+    L.write_md(dest, t)
     roster_add(name, a.owns, f"delegated automatically, or `claude --agent {name}`")
     L.journal_add(f"hired {name} (owns {a.owns})")
     left = sorted(set(re.findall(r"<FILL:[^<>\n]*>", t)))

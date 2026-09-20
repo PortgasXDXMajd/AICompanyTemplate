@@ -46,8 +46,8 @@ def cmd_new(a):
     if L.board_find(rows, job) or d.exists():
         L.die(f"job {job} already exists; pick another slug")
     d.mkdir(parents=True)
-    (d / "brief.md").write_text(BRIEF.format(job=job, folder=d, task=a.task))
-    (d / "progress.md").write_text(f"# Progress: {job}\n\n")
+    L.write_md(d / "brief.md", BRIEF.format(job=job, folder=d, task=a.task))
+    L.write_md(d / "progress.md", f"# Progress: {job}\n")
     rows.append({"Job": job, "Employee": a.employee, "Task": a.task, "Repo": a.repo,
                  "Worktree": "", "Branch": "", "Base": "", "Runner": a.runner or "",
                  "State": "briefed", "Updated": L.stamp(), "Next step": "write the brief, create the worktree, start"})
@@ -83,8 +83,7 @@ def cmd_progress(a):
     if not d.exists():
         L.die(f"no job folder {d}")
     line = f"- {L.stamp()} {L.clean_cell(a.text)}"
-    with (d / "progress.md").open("a") as f:
-        f.write(line + "\n")
+    L.append_item(d / "progress.md", line, header=f"# Progress: {a.job}\n")
     print(line)
 
 
@@ -125,11 +124,10 @@ def cmd_close(a):
     rows.remove(r)
     L.board_write(head, rows, tail)
     d = L.job_dir(a.job); d.mkdir(parents=True, exist_ok=True)
-    (d / "closed.md").write_text(f"# Closed\n\n- outcome: {a.outcome}\n- when: {L.stamp()}\n- note: {a.log}\n")
+    L.write_md(d / "closed.md", f"# Closed\n\n- outcome: {a.outcome}\n- when: {L.stamp()}\n- note: {L.clean_cell(a.log)}\n")
     if a.outcome == "merged":
         where = a.path or L.rel(d)
-        with (L.ROOT / "context" / "log.md").open("a") as f:
-            f.write(f"{L.today()} | {r['Employee']} | {L.clean_cell(a.log)} | {where}\n")
+        L.append_item(L.ROOT / "context" / "log.md", f"- {L.today()} | {r['Employee']} | {L.clean_cell(a.log)} | {where}")
     L.journal_add(f"job closed ({a.outcome}): {a.log}", a.job)
     L.out({"job": a.job, "outcome": a.outcome, "logged": a.outcome == "merged"}, a.json)
 

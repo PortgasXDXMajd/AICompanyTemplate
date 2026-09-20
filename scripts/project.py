@@ -98,8 +98,8 @@ def cmd_register(a):
         row.update({"GitHub repo": cell, "Purpose": a.purpose or row["Purpose"], "Status": a.status})
     else:
         rows.append({"Name": a.name, "GitHub repo": cell, "Purpose": a.purpose or "", "Status": a.status, "Created": L.today()})
-    body = ["| " + " | ".join(L.clean_cell(r[c]) if c != "GitHub repo" else r[c] for c in COLS) + " |" for r in rows]
-    REG.write_text("\n".join(head + body + tail).rstrip("\n") + "\n")
+    body = [L.table_row([L.clean_cell(r[c]) if c != "GitHub repo" else r[c] for c in COLS]) for r in rows]
+    L.write_md(REG, "\n".join(head + body + tail))
     L.journal_add(f"project {a.name}: registry row set ({a.status})")
     print(f"registered {a.name} [{a.status}]")
 

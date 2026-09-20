@@ -2,7 +2,7 @@
 
 Where employees work. Every employee run gets its own git worktree here, so several employees can work at the same time without touching each other's files, and nothing reaches a main checkout before it is reviewed.
 
-```
+```text
 worktrees/
   <project>/<employee>--<slug>/   worktree of projects/<project>, on branch <employee>/<slug>
   _hq/<employee>--<slug>/         worktree of this HQ repo, on branch <employee>/<slug>

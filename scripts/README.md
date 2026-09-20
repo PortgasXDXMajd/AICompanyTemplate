@@ -16,7 +16,8 @@ Run them from the HQ root: `python3 scripts/<name>.py --help`. Scripts that prin
 | `team.py` | Employees: `add-adviser`, `add` (role file from the template plus roster row), `list` | `new-project`, `hire` |
 | `skills.py` | Third-party skills: `list`, `install`, `update` | README, `preflight.py` |
 | `qa_probe.py` | Which hands-on QA tooling this machine has; `wait-url` polls a dev server with a time limit | `qa-check` |
-| `doctor.py` | Read-only consistency check: frontmatter, settings, size budgets, references to missing paths, board vs folders vs worktrees, unfilled role-file placeholders | `doctor` skill, `end-of-day`, `weekly-review` |
+| `mdfix.py` | Keeps Markdown free of markdownlint warnings: fixes tables, fence languages, blank lines, spacing, bare URLs and tag-like placeholders in place; reports what only an author can fix; `--hook` is the PostToolUse hook that runs after every write; `--check`, `--all`, `--verify` (real markdownlint through npx). The other scripts format their own Markdown output through it | the hook in `.claude/settings.json`, `markdown` skill, `doctor.py` |
+| `doctor.py` | Read-only consistency check: frontmatter, settings, size budgets, references to missing paths, Markdown lint, board vs folders vs worktrees, unfilled role-file placeholders | `doctor` skill, `end-of-day`, `weekly-review` |
 
 ## What is deliberately not scripted
 

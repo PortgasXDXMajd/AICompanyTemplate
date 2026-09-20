@@ -4,9 +4,10 @@
   doctor.py            all checks
   doctor.py budgets    only the size budgets of the instruction files
   doctor.py refs       only paths mentioned in instruction files that do not exist
+  doctor.py markdown   only the Markdown lint check (scripts/mdfix.py --check --all)
 
 Checks: skill and employee frontmatter, settings.json, skills-lock vs folders, size budgets,
-references to missing paths, job board vs job folders vs worktrees, unfilled placeholders in role files.
+references to missing paths, Markdown lint, job board vs job folders vs worktrees, unfilled placeholders in role files.
 Exit code 1 if any problem is found.
 """
 import argparse
@@ -53,6 +54,35 @@ def instruction_files():
     return [f for f in files if f.exists()]
 
 
+def yaml_string_problem(value):
+    """Why an unquoted front matter value would not reach Claude Code as a plain string, or None if it is fine."""
+    v = value.strip()
+    if not v:
+        return "is empty"
+    if v[0] in "\"'":
+        return None if len(v) > 1 and v[-1] == v[0] else "has an unclosed quote"
+    if v[0] in "[{":
+        return "starts with '[' or '{', which YAML reads as a list or a map: put it in double quotes"
+    if v[0] in "*&!|>%@`" or v.startswith(("- ", "? ")):
+        return f"starts with {v[0]!r}, which is YAML syntax: put it in double quotes"
+    if ": " in v or v.endswith(":"):
+        return "contains ': ', which YAML reads as a nested key: put it in double quotes"
+    if " #" in v:
+        return "contains ' #', which YAML reads as a comment: put it in double quotes"
+    return None
+
+
+STRING_KEYS = ("name", "description", "argument-hint", "when_to_use", "model", "effort", "memory")
+
+
+def check_strings(label, fm, problems):
+    for key in STRING_KEYS:
+        if key in fm:
+            why = yaml_string_problem(fm[key])
+            if why:
+                problems.append(f"{label}: front matter `{key}` {why}")
+
+
 def check_frontmatter(problems):
     for d in sorted((R / ".claude" / "skills").glob("*")):
         if not d.is_dir():
@@ -61,15 +91,22 @@ def check_frontmatter(problems):
         fm = frontmatter(f) if f.exists() else None
         if not fm:
             problems.append(f"skill {d.name}: SKILL.md missing or has no frontmatter")
-        elif fm.get("name") != d.name:
+        elif fm.get("name", "").strip("\"'") != d.name:
             problems.append(f"skill {d.name}: frontmatter name is {fm.get('name')!r}")
         elif not fm.get("description"):
             problems.append(f"skill {d.name}: no description")
+        if fm:
+            check_strings(f"skill {d.name}", fm, problems)
+        for extra in sorted(d.glob("*.md")):                 # role templates shipped inside a skill
+            efm = frontmatter(extra) if extra.name != "SKILL.md" else None
+            if efm and "name" in efm:
+                check_strings(L.rel(extra), efm, problems)
     for f in sorted((R / ".claude" / "agents").glob("*.md")):
         fm = frontmatter(f)
         if not fm or "name" not in fm:
             continue   # README and other notes are ignored by Claude Code too
-        if fm["name"] != f.stem:
+        check_strings(f"employee {f.name}", fm, problems)
+        if fm["name"].strip("\"'") != f.stem:
             problems.append(f"employee {f.name}: frontmatter name is {fm['name']!r}")
         if not fm.get("description") or "<FILL" in fm.get("description", ""):
             problems.append(f"employee {f.name}: description is empty or still a placeholder (it is the routing rule)")
@@ -119,6 +156,13 @@ def check_refs(problems):
                 problems.append(f"{L.rel(f)} mentions `{ref}`, which does not exist")
 
 
+def check_markdown(problems):
+    import mdfix
+    for p in mdfix.all_files():
+        for line, rule, msg in mdfix.check_text(p.read_text()):
+            problems.append(f"{L.rel(p)}:{line} {rule} {msg}")
+
+
 def check_jobs(problems):
     try:
         _, rows, _ = L.board_read()
@@ -139,7 +183,7 @@ def check_jobs(problems):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("what", nargs="?", default="all", choices=["all", "budgets", "refs"])
+    ap.add_argument("what", nargs="?", default="all", choices=["all", "budgets", "refs", "markdown"])
     a = ap.parse_args()
     problems, report = [], []
     if a.what in ("all",):
@@ -148,6 +192,8 @@ def main():
         check_budgets(problems, report)
     if a.what in ("all", "refs"):
         check_refs(problems)
+    if a.what in ("all", "markdown"):
+        check_markdown(problems)
     for r in report:
         print(r)
     if problems:

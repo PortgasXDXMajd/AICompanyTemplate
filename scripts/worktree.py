@@ -87,7 +87,7 @@ def cmd_add(a):
             t = brief.read_text()
             marker = "_path, branch, base (filled in by worktree.py add --job)_"
             if marker in t:
-                brief.write_text(t.replace(marker, f"`{L.ROOT / data['worktree']}`, branch `{branch}`, base `{base}` (cut from `{base_branch}`)"))
+                L.write_md(brief, t.replace(marker, f"`{L.ROOT / data['worktree']}`, branch `{branch}`, base `{base}` (cut from `{base_branch}`)"))
         L.journal_add(f"worktree created {data['worktree']} on {branch} at {base}", a.job)
     L.out(data, a.json)
     if not a.json:

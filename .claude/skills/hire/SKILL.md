@@ -17,7 +17,7 @@ Role requested: $ARGUMENTS
 A role is justified only if all four hold. If one fails, say so plainly and offer the alternative.
 
 | Test | If it fails |
-|---|---|
+| --- | --- |
 | **Recurring work.** This kind of task will come up again and again, and it serves the current goal or a Now/Next roadmap item. | One-off work: the Chief of Staff just does it. |
 | **Owned output.** There are files or folders this employee will be responsible for. | It is a persona with no job. Do not create it. |
 | **Checkable done.** You can state what finished, good work looks like for this role. | Define that first, or the role cannot be reviewed. |
@@ -47,7 +47,7 @@ Show the CEO the complete role file. Hiring needs an explicit yes.
 
 ## 4. Create the employee
 
-1. Run `python3 scripts/team.py add <name> --owns "<files and folders>"` (add `--developer` for a role that writes code; without it the engineering block is removed). It copies `employee-template.md` to `.claude/agents/<name>.md` with the name set and adds the roster row. Then fill every `<FILL: ...>` placeholder; `python3 scripts/team.py list` shows how many are left, and `python3 scripts/doctor.py` fails while any remain. Delete guidance comments. Keep the file under about 60 lines: a role file is a job description, and the company context already arrives through `CLAUDE.md`.
+1. Run `python3 scripts/team.py add <name> --owns "<files and folders>"` (add `--developer` for a role that writes code; without it the engineering block is removed). It copies `employee-template.md` to `.claude/agents/<name>.md` with the name set and adds the roster row. Then fill every `<FILL: ...>` placeholder. Keep the `description` in double quotes: front matter is YAML, and an unquoted value that contains a colon followed by a space, or that starts with `[`, stops being a string; `python3 scripts/team.py list` shows how many are left, and `python3 scripts/doctor.py` fails while any remain. Delete guidance comments. Keep the file under about 60 lines: a role file is a job description, and the company context already arrives through `CLAUDE.md`.
 2. Check the row the script added to `context/team.md`: what the employee owns is what the Chief of Staff routes by.
 3. Append the hire and its reason to `context/decisions.md`, add a line to `context/log.md`, and commit with `Hire <name>`.
 4. Claude Code picks up a new file in `.claude/agents/` within a few seconds, no restart needed. If delegating to `<name>` still fails after that, ask the CEO to restart `claude`.

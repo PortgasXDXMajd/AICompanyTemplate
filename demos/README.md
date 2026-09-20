@@ -8,7 +8,7 @@ Proof of finished work. A demo lets the CEO see, in under two minutes and withou
 
 Each entry contains:
 
-```
+```markdown
 # Title
 - Spec: specs/NNN-name.md
 - Built by: <employee>

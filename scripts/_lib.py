@@ -67,6 +67,27 @@ def clean_cell(text):
     return re.sub(r"\s+", " ", str(text or "")).replace("|", "/").strip()
 
 
+def table_row(cells):
+    """One Markdown table row in markdownlint's 'compact' style: one space around every cell, `| |` for an empty one."""
+    return "|" + "|".join(f" {c} " if c else " " for c in cells) + "|"
+
+
+def write_md(path, text):
+    """Write a Markdown file the way markdownlint wants it (mdfix.py does the formatting)."""
+    import mdfix                      # imported here: mdfix itself imports this module
+    Path(path).write_text(mdfix.fix_text(text))
+
+
+def append_item(path, item, header=None):
+    """Append one '- ...' list item to a Markdown file, keeping a blank line between prose or a heading and the list."""
+    p = Path(path)
+    text = p.read_text() if p.exists() else (header or "")
+    body = text.rstrip("\n")
+    last = body.splitlines()[-1] if body else ""
+    sep = "\n" if last.startswith("- ") else "\n\n"
+    p.write_text((body + sep if body else "") + item.rstrip("\n") + "\n")
+
+
 def valid_slug(slug):
     if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,40}", slug or ""):
         die(f"slug must be lower-case letters, digits and '-', got: {slug!r}")
@@ -88,13 +109,10 @@ def journal_path(day=None):
 def journal_add(text, job=None):
     p = journal_path()
     p.parent.mkdir(parents=True, exist_ok=True)
-    if not p.exists():
-        p.write_text(f"# Journal {today()}\n\n")
     line = f"- {now().strftime('%H:%M')} {clean_cell(text)}"
     if job:
         line += f" ({job})"
-    with p.open("a") as f:
-        f.write(line + "\n")
+    append_item(p, line, header=f"# Journal {today()}\n")
     return line
 
 
@@ -134,8 +152,8 @@ def board_read():
 
 
 def board_write(head, rows, tail):
-    body = ["| " + " | ".join(clean_cell(r.get(c, "")) for c in BOARD_COLS) + " |" for r in rows]
-    board_path().write_text("\n".join(head + body + tail).rstrip("\n") + "\n")
+    body = [table_row([clean_cell(r.get(c, "")) for c in BOARD_COLS]) for r in rows]
+    write_md(board_path(), "\n".join(head + body + tail))
 
 
 def board_find(rows, job):

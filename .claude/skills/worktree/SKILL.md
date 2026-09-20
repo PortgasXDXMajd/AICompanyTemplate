@@ -26,7 +26,7 @@ Do not set `isolation: worktree` in an employee's role file. Claude Code's built
 ## Naming (the script enforces it)
 
 | Thing | Pattern | Example |
-|---|---|---|
+| --- | --- | --- |
 | Branch | `<employee>/<slug>` | `backend-engineer/003-email-signup` |
 | Product worktree | `worktrees/<project>/<employee>--<slug>` | `worktrees/my-app/backend-engineer--003-email-signup` |
 | HQ worktree | `worktrees/_hq/<employee>--<slug>` | `worktrees/_hq/growth-marketer--landing-copy` |

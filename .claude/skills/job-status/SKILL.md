@@ -38,7 +38,7 @@ Last resort, when the journal and the job folders do not explain something: the 
 ## 3. Classify
 
 | Verdict | Evidence | Recommendation |
-|---|---|---|
+| --- | --- | --- |
 | **Running fine** | live runner, recent progress lines | leave it, say when you will look again |
 | **Needs the CEO** | runner `blocked`, or state `blocked` / `awaiting-merge` | say exactly what is being asked and where |
 | **Finished, not reviewed** | `handback.md` exists, no review files | start the review now |
@@ -56,7 +56,7 @@ Judge the work too, not only the state: read the last progress lines and the dif
 
 Lead with one line: how many jobs are open and how many need the CEO. Then one block per job, worst first:
 
-```
+```text
 <job id>: <employee>, <task>
 State: <verdict>, <one line of evidence>
 Good / not good: <your judgment of the work so far, and why>

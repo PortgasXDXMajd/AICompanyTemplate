@@ -4,7 +4,7 @@ Append-only. Newest at the bottom. Record decisions that a future session would 
 
 Format:
 
-```
+```markdown
 ## YYYY-MM-DD: Short title
 - Decision: what was decided
 - Why: the reason, including what was rejected

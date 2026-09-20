@@ -1,0 +1,20 @@
+{
+  // One rule set for the VS Code markdownlint extension, `npx markdownlint-cli2`, and scripts/mdfix.py.
+  "config": {
+    "default": true,
+    "MD013": false,                      // line length: prose is not hard-wrapped here
+    "MD060": { "style": "compact" }      // tables: one space around every cell, `| --- |` delimiter rows
+  },
+  // Third-party skills are vendored and pinned (skills-lock.json): never edited, so never linted.
+  "ignores": [
+    ".claude/skills/grilling/**",
+    ".claude/skills/tdd/**",
+    ".claude/skills/improve/**",
+    ".claude/skills/improve-codebase-architecture/**",
+    ".claude/skills/codebase-design/**",
+    ".claude/skills/domain-modeling/**",
+    ".claude/skills/thermo-nuclear-code-quality-review/**",
+    ".claude/skills/herdr/**",
+    "node_modules/**"
+  ]
+}

@@ -2,7 +2,7 @@
 
 The company's flight recorder for work in progress. Every delegation is a **job** with its own folder, and `BOARD.md` lists every job that is not finished. If a session dies, a new one reads this folder and knows exactly what was running, how far it got, and what to do next. The `job-status` skill does that reading.
 
-```
+```text
 jobs/
   BOARD.md                         every open job, one row each
   <YYYYMMDD>-<employee>--<slug>/   one folder per job
@@ -31,7 +31,7 @@ Rules:
 ## States
 
 | State | Meaning | Who moves it on |
-|---|---|---|
+| --- | --- | --- |
 | `briefed` | Row, brief and worktree exist; the employee has not started | Chief of Staff |
 | `running` | The employee is working | employee finishes, or a session notices it stopped |
 | `blocked` | Waiting on the CEO (an approval, a question, a merge conflict) | CEO |

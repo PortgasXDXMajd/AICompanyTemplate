@@ -15,7 +15,7 @@ Target: $ARGUMENTS
 The tools decide who can do this:
 
 | Surface | First choice | Fallback |
-|---|---|---|
+| --- | --- | --- |
 | Web app, site | **Claude in Chrome**: a real browser the CEO can watch. Needs the Claude in Chrome extension and a session started with `claude --chrome` (or `/chrome`). It does not work in headless `-p` runs, and in-process subagents do not get its tools. | **Playwright MCP**, headless and available to any session: `claude mcp add playwright -- npx -y @playwright/mcp@latest` |
 | Mobile app (native, React Native, Flutter, Expo) | **Maestro** on an Android emulator or iOS simulator: `claude mcp add maestro -- maestro mcp` (needs Java 17+). iOS simulators exist only on macOS with Xcode. | Android without Maestro: `adb` (`uiautomator dump` for element bounds, `input tap`, `exec-out screencap -p`). Responsive web or PWA target: browser device emulation, reported as "web-emulated, not device-verified". |
 | API, CLI, background job | Call it for real: `curl`, the CLI binary, a script. | none needed |

@@ -53,10 +53,11 @@ projects/          Product repos, cloned here, tracked in their own GitHub repos
 worktrees/         One git worktree per running employee (gitignored)
 .claude/agents/    Employees
 .claude/skills/    Company procedures (onboard, hire, new-project, feature, delegate, worktree,
-                   job-status, refinement-check, qa-check, doctor), plus third-party skills
+                   job-status, refinement-check, qa-check, doctor, markdown), plus third-party skills
                    installed with `npx skills`
 scripts/           The deterministic plumbing the skills call (Python, standard library only)
-.claude/settings.json  Makes Claude Code ask you before a push, a GitHub repo operation,
+.markdownlint-cli2.jsonc  Markdown lint rules for VS Code, markdownlint-cli2 and scripts/mdfix.py
+.claude/settings.json  Runs the Markdown fixer after every write; makes Claude Code ask you before a push, a GitHub repo operation,
                    or an edit to a product's main checkout; allows the scripts, git inside
                    worktrees, and the Herdr commands delegation uses
 skills-lock.json   Versions of the third-party skills
@@ -99,9 +100,14 @@ Skills decide and judge; scripts do the repeatable plumbing the same way every t
 | `worktree.py` | Create, check, update, merge and remove employee worktrees, with every guard built in |
 | `agent.py` | Start an employee or a helper in its own Herdr tab, prompt it, wait for it, read it, close it |
 | `project.py`, `team.py` | Product repos and their registry; role files and the roster |
+| `mdfix.py` | Keeps every Markdown file free of markdownlint warnings; runs by itself after each write |
 | `skills.py`, `qa_probe.py`, `doctor.py` | Third-party skills; what hands-on QA can run here; a consistency check of the whole repo |
 
 Pushes, GitHub repo creation and PR merges are deliberately **not** in any script: those commands run in the open so Claude Code's permission prompt reaches you.
+
+## Markdown without warnings
+
+Everything here is Markdown, so it is kept clean under [markdownlint](https://github.com/DavidAnson/markdownlint), the linter behind the warnings in VS Code. `.markdownlint-cli2.jsonc` holds the rules (defaults, line length off, compact tables; third-party skills are ignored because they are never edited). A `PostToolUse` hook in `.claude/settings.json` runs `scripts/mdfix.py` on every `.md` file Claude writes: it fixes table spacing, code fences without a language, blank lines and the rest in place, and hands anything it cannot decide back to Claude to fix in the same turn. The scripts that write Markdown (job board, journal, registry, roster, role files) format their output the same way. `python3 scripts/mdfix.py --all` fixes the whole repo by hand, and `python3 scripts/doctor.py` fails if any file is not clean.
 
 ## Commands
 
