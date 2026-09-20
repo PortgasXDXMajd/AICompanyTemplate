@@ -2,6 +2,10 @@
 /projects/*
 !/projects/README.md
 
+# Employee worktrees: one checkout per running employee, branches live in the repos themselves
+/worktrees/*
+!/worktrees/README.md
+
 # Local-only Claude Code state
 .claude/settings.local.json
 .claude/agent-memory-local/

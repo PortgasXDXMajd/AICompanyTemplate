@@ -22,7 +22,7 @@ _What is deliberately left out of this version._
 ## Definition of done
 - [ ] Checkable condition
 - [ ] Checkable condition
-- [ ] Demo added to `demos/`
+- [ ] Hands-on QA passed (anything a user sees or touches), with evidence for the demo
 
 ## Approach
 _Short. Enough for the owner to start and a reviewer to follow. For code: list new or sharpened **Domain terms** here; the developer adds them to the project's `CONTEXT.md`._

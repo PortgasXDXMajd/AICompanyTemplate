@@ -2,6 +2,7 @@
 
 Proof of finished work. A demo lets the CEO see, in under two minutes and without reading code, that something works.
 
+- The Chief of Staff writes the entry, from the hands-on QA evidence in the job folder (`jobs/<job-id>/qa/`) and the developer's hand-back.
 - One entry per shipped spec: `demos/YYYY-MM-DD-short-name.md`, or a folder of the same name if there are screenshots or recordings.
 - A demo is evidence, so it shows the real thing running: a screenshot, a recording, a URL, command output, the sent draft. A description of what was built is not a demo.
 

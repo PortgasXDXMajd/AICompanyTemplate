@@ -18,7 +18,7 @@ Run every command from the HQ repo root. Use `git -C projects/<name> ...` instea
 
 Check the tools first: `gh --version` and `gh auth status`. Then get these, asking only for what is missing:
 
-- **Name:** kebab-case, short, no spaces. Check it is not already in the registry or present under `projects/`.
+- **Name:** kebab-case, short, no spaces, not starting with an underscore (`worktrees/_hq/` is reserved). Check it is not already in the registry or present under `projects/`.
 - **Purpose:** one line. Take it from `context/company.md` when this is the main product.
 - **New or existing:** if the CEO gave a URL or says the repo exists, go to step 4.
 - **Owner:** the GitHub user or org. Default to the account from `gh api user --jq .login`. If `gh` is unavailable, ask the CEO.
@@ -28,7 +28,7 @@ Check the tools first: `gh --version` and `gh auth status`. Then get these, aski
 
 The CEO chooses the stack. Your job is to make it a considered choice and to write it down where every future session will read it.
 
-Call the Skill tool with "grilling" and follow it. The roots of the design tree are the rows of `project-claude-template.md` (next to this file): product form, language and runtime, framework, data store, auth, hosting, package manager, testing, lint and format, CI. Ask only about rows that apply, and let earlier answers decide which later questions exist (no data store question for a static site).
+Call the Skill tool with "grilling" and follow it. The roots of the design tree are the rows of `project-claude-template.md` (next to this file): product form, language and runtime, framework, data store, auth, hosting, package manager, testing, lint and format, hands-on QA tooling, CI. Testing is test-first here (`tdd` skill), so the testing choice must support fast integration-style tests; for anything with a screen, settle how it will be driven for QA (`qa-check` skill). Ask only about rows that apply, and let earlier answers decide which later questions exist (no data store question for a static site).
 
 - Bring a recommended answer to every question, based on `context/company.md` (stage, hours per week, budget), what the CEO already knows well, and what the buyer needs. For a company before its first customer, recommend the boring, familiar option the CEO can debug themselves over the fashionable one, and say so.
 - If the CEO names a stack up front, do not re-ask it. Grill only the gaps and any choice that conflicts with the constraints.
@@ -49,7 +49,7 @@ git -C projects/<name> commit -m "Initial commit: README and CLAUDE.md with tech
 gh repo create <owner>/<name> --<visibility> --source projects/<name> --remote origin --push
 ```
 
-Two files only. `CLAUDE.md` is `project-claude-template.md` filled in with the stack from step 2. The README stays honest about the stage:
+Two files only. Claude Code will ask the CEO to approve each write, because `.claude/settings.json` guards product main checkouts; that is expected here, so do not route around it with a shell command. `CLAUDE.md` is `project-claude-template.md` filled in with the stack from step 2. The README stays honest about the stage:
 
 ```markdown
 # <Project name>
@@ -89,7 +89,7 @@ gh repo clone <owner>/<name> projects/<name>
 
 Read its README and its `CLAUDE.md` if present, so the purpose line in the registry is accurate.
 
-If it has no `CLAUDE.md`, or the one it has does not state the tech stack: work the stack out from the code yourself (manifests, lockfiles, config) and fill in `project-claude-template.md`, including Commands and Structure from what is actually there. Replace "Decided by the CEO on" with "Recorded from the existing code on YYYY-MM-DD, confirmed by the CEO". Ask the CEO only about what the code cannot tell you. Commit the file on a branch `chief-of-staff/add-claude-md`, show it to the CEO, and ask for the merge in the same message, recommending yes. Until it is merged, leave that branch checked out and write `CLAUDE.md pending merge` in the registry row. Change nothing else in the repo.
+If it has no `CLAUDE.md`, or the one it has does not state the tech stack: work the stack out from the code yourself (manifests, lockfiles, config) and fill in `project-claude-template.md`, including Commands and Structure from what is actually there. Replace "Decided by the CEO on" with "Recorded from the existing code on YYYY-MM-DD, confirmed by the CEO". Ask the CEO only about what the code cannot tell you. Write and commit the file in a worktree `worktrees/<name>/chief-of-staff--add-claude-md` (`worktree` skill), show it to the CEO, and ask for the merge in the same message, recommending yes. Until it is merged, write `CLAUDE.md pending merge` in the registry row, and point anyone who needs the file at that worktree. Change nothing else in the repo.
 
 Before step 5, two things the new-repo path covers in step 2: if `.claude/agents/senior-technical-adviser.md` does not exist, tell the CEO this project adds the Senior Technical Adviser as the first employee (newest Fable model, maximum effort: the most expensive setting; it plans, it never implements) and get an explicit yes. And if `context/engineering.md` says `STATUS: DEFAULTS`, run the House style branch of step 2 now.
 
@@ -106,7 +106,7 @@ If `.claude/agents/senior-technical-adviser.md` is missing, then with the CEO's 
 
 ## 7. Put the adviser to work
 
-- **Existing repo with code:** recommend an audit to the CEO and say what it costs: the adviser is the expensive model. On a yes, first make the project readable, because the adviser may not install anything: default branch (or `chief-of-staff/add-claude-md`) checked out, clean, pulled, dependencies installed with the project's install command. Then delegate to `senior-technical-adviser` with a brief: audit `projects/<name>` at `standard` depth. It returns a findings table; bring that to the CEO, get their selection, and delegate again for the plans. The CEO can instead run it interactively with `claude --agent senior-technical-adviser`.
+- **Existing repo with code:** recommend an audit to the CEO and say what it costs: the adviser is the expensive model. On a yes, first make the project readable, because the adviser may not install anything: main checkout on the default branch, clean, pulled, dependencies installed with the project's install command. Then, with the `delegate` skill (the adviser gets an HQ worktree), delegate to `senior-technical-adviser` with a brief: audit `projects/<name>` at `standard` depth. It returns a findings table; merge its branch into HQ, bring the table to the CEO, get their selection, and delegate again for the plans. The CEO can instead run it interactively with `claude --agent senior-technical-adviser`.
 - **New, empty repo:** there is nothing to audit. The adviser's first job comes when the first spec is approved (`feature` skill): it turns the spec into plans.
 
 If `senior-technical-adviser` cannot be delegated to yet, do not substitute a general-purpose subagent: ask the CEO to restart `claude`.

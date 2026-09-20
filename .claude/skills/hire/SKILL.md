@@ -38,6 +38,7 @@ Draft these yourself from `context/company.md` and `ROADMAP.md`, then show the C
 - **Boundaries:** what it must not do. Actions needing CEO approval are already in `CLAUDE.md`; add role-specific ones.
 - **Tools:** leave `tools` out to inherit everything, which suits builders. Restrict it for roles that should not run commands or change code, for example `tools: Read, Grep, Glob, Write, Edit, WebSearch, WebFetch` for a researcher or writer. Do not grant the `Agent` tool: employees do not delegate, handoffs go through the Chief of Staff.
 - **Developer roles** (backend, frontend, mobile, anything that writes code): the role file must tell the employee to read `context/engineering.md` and the project's `CLAUDE.md` before starting, and to hand back the project, base, branch and changed files so the `refinement-check` skill can run. Which developer roles to hire is a question for the Senior Technical Adviser: its plans name the owner each task needs. The template has a block for this; keep it for developers and delete it for everyone else.
+- **Isolation:** leave the `isolation` field out. Every employee works in a worktree the company creates under `worktrees/` (`worktree` skill); Claude Code's built-in `isolation: worktree` would put it in an HQ-only worktree somewhere else, without the product code.
 - **Model:** `opus`. The CEO's standing rule is that every hire runs on the newest Opus model; the `opus` alias always points at it, so never pin a dated model ID. The only exception is the Senior Technical Adviser, which runs on `fable` at `effort: max` and is created by the `new-project` skill, not here. Change a hire's model only if the CEO asks.
 
 ## 3. Get approval
@@ -53,7 +54,7 @@ Show the CEO the complete role file. Hiring needs an explicit yes.
 
 ## 5. First assignment
 
-Pick one small, real task from the roadmap. For a developer that is normally the next plan in `plans/<project>/` that the adviser marked `unowned` for this role: set the owner in the plan and the index first. Set `owner: <name>` on its roadmap item (add the item to **Now** if it is not on the roadmap yet), write the delegation brief, and delegate. If the employee is not available, do not substitute a general-purpose subagent: ask the CEO to restart `claude` and say "give `<name>` its first assignment". When the task returns, put it through `REVIEW.md`. Whatever the review catches that better instructions would have prevented, fix in the role file now. A role file is tuned by its first few tasks, not by the draft.
+Pick one small, real task from the roadmap. For a developer that is normally the next plan in `plans/<project>/` that the adviser marked `unowned` for this role: set the owner in the plan and the index first. Set `owner: <name>` on its roadmap item (add the item to **Now** if it is not on the roadmap yet), and delegate it with the `delegate` skill. If the employee is not available, do not substitute a general-purpose subagent: ask the CEO to restart `claude` and say "give `<name>` its first assignment". When the task returns, put it through `REVIEW.md`. Whatever the review catches that better instructions would have prevented, fix in the role file now. A role file is tuned by its first few tasks, not by the draft.
 
 ## Changing or removing an employee
 

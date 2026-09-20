@@ -2,12 +2,12 @@
 
 - **Trigger:** start of the CEO's working day, or "run the standup"
 - **Owner:** Chief of Staff
-- **Inputs:** `ROADMAP.md`, tail of `context/log.md`, open specs in `specs/`
+- **Inputs:** `ROADMAP.md`, `jobs/BOARD.md`, yesterday's file in `context/journal/`, tail of `context/log.md`, open specs in `specs/`
 - **Output:** a message to the CEO, ten lines or fewer. Nothing is written unless something changed.
 
 ## Steps
 
-1. Read the **Now** section of `ROADMAP.md` and the last 20 lines of `context/log.md`.
+1. Run the `job-status` skill if any job is open. Read the **Now** section of `ROADMAP.md`, the summary at the end of the last journal (if it has none, that day was never closed: offer to run `routines/end-of-day.md` first), and any pending file in `routines/reviews/` from the end-of-day routine.
 2. For each item in Now, establish its real state by looking at the files and the project repo, not from memory: not started, in progress, blocked, or done.
 3. Report:
    - **Goal:** the current goal and the days remaining.

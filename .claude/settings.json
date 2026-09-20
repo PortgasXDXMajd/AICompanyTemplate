@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C worktrees/*)",
+      "Bash(herdr tab create *)",
+      "Bash(herdr tab close *)",
+      "Bash(herdr tab list *)",
+      "Bash(herdr agent start *)",
+      "Bash(herdr agent prompt *)",
+      "Bash(herdr agent wait *)",
+      "Bash(herdr agent get *)",
+      "Bash(herdr agent read *)",
+      "Bash(herdr agent list*)",
+      "Bash(herdr pane list *)"
+    ],
+    "ask": [
+      "Bash(git push)",
+      "Bash(git push *)",
+      "Bash(git * push *)",
+      "Bash(git * push)",
+      "Bash(gh repo create *)",
+      "Bash(gh repo delete *)",
+      "Bash(gh repo edit *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh release *)",
+      "Edit(/projects/*/**)"
+    ]
+  }
+}
