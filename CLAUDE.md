@@ -66,13 +66,13 @@ Always stop and ask before: spending money, sending anything to a person outside
 | `REVIEW.md` | Quality bar and review process | Chief of Staff |
 | `customers/` | Evidence about real buyers | Whoever owns research |
 | `specs/` | What we are going to build or do, before we do it | Whoever owns product |
-| `plans/<project>/` | Executor-ready implementation plans, one per task and employee | Senior Technical Adviser |
+| `plans/<project>/` | Executor-ready implementation plans, one per task and employee. `PROFILE.md`: how an imported codebase is built and the standards it follows | Senior Technical Adviser |
 | `work/<area>/` | Non-code deliverables: copy, outreach drafts, research, pricing | Whoever produced it |
 | `demos/` | Proof of finished work the CEO can look at in two minutes | Chief of Staff, from QA and hand-back evidence |
 | `routines/` | Recurring procedures (standup, end of day, weekly review) | Chief of Staff |
-| `projects/` | Product repos, cloned locally, each tracked in its own GitHub repo. Each has its own `CLAUDE.md` with its tech stack. Main checkouts: default branch, clean | Chief of Staff |
+| `projects/` | Product repos, cloned locally, each tracked in its own GitHub repo: started with `new-project`, or brought in with `import-project` when the code already exists. Each has its own `CLAUDE.md` with its tech stack and conventions. Main checkouts: default branch, clean | Chief of Staff |
 | `worktrees/` | One git worktree per running employee, gitignored. Where all employee work happens | Chief of Staff, via `worktree` |
-| `.claude/agents/` | Employees | Chief of Staff, via `hire` and `new-project` |
+| `.claude/agents/` | Employees | Chief of Staff, via `hire`, `new-project` and `import-project` |
 | `.claude/skills/` | Company procedures. Skills listed in `skills-lock.json` are third-party: never edit them | Chief of Staff |
 | `scripts/` | The deterministic plumbing the skills call: jobs, journal, worktrees, Herdr agents, status, projects, team, doctor. Use them instead of doing the same steps by hand (`scripts/README.md`) | Chief of Staff |
 

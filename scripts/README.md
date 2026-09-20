@@ -12,8 +12,8 @@ Run them from the HQ root: `python3 scripts/<name>.py --help`. Scripts that prin
 | `worktree.py` | One worktree per employee run: `add` (checks, naming, base, fills the brief and the board), `status`, `update` (bring a branch up to date), `merge` (guards, aborts on conflict), `remove` (never forces), `list` (finds strays) | `worktree`, `delegate`, `refinement-check`, `job-status` |
 | `agent.py` | Herdr: `start` an employee or a helper in its own tab and prompt it with its brief, `prompt` a fix round, `wait`, `read`, `list`, `close`; `where` says `herdr` or `plain` | `delegate`, `refinement-check`, `qa-check` |
 | `status.py` | Collects the facts about every open job (files, verdict lines, progress, worktree, commits, merged or not, live Herdr agents, strays) and suggests a verdict | `job-status`, `daily-standup`, `end-of-day` |
-| `project.py` | Product repos: `init`, `commit` (first commit), `clone`, `register` (registry row), `list` | `new-project` |
-| `team.py` | Employees: `add-adviser`, `add` (role file from the template plus roster row), `list` | `new-project`, `hire` |
+| `project.py` | Product repos: `init`, `commit` (first commit; `--all` for an imported folder, refusing files that look like secrets), `clone`, `import-local` (a codebase from a folder on this machine; the folder is never touched), `survey` (read-only inventory of an existing codebase: git habits, manifests, tooling, tests, CI, containers, data, env variable names), `register` (registry row), `list` | `new-project`, `import-project` |
+| `team.py` | Employees: `add-adviser`, `add` (role file from the template plus roster row), `list` | `new-project`, `import-project`, `hire` |
 | `skills.py` | Third-party skills: `list`, `install`, `update` | README, `preflight.py` |
 | `qa_probe.py` | Which hands-on QA tooling this machine has; `wait-url` polls a dev server with a time limit | `qa-check` |
 | `mdfix.py` | Keeps Markdown free of markdownlint warnings: fixes tables, fence languages, blank lines, spacing, bare URLs and tag-like placeholders in place; reports what only an author can fix; `--hook` is the PostToolUse hook that runs after every write; `--check`, `--all`, `--verify` (real markdownlint through npx). The other scripts format their own Markdown output through it | the hook in `.claude/settings.json`, `markdown` skill, `doctor.py` |
@@ -21,7 +21,7 @@ Run them from the HQ root: `python3 scripts/<name>.py --help`. Scripts that prin
 
 ## What is deliberately not scripted
 
-- **Anything that needs the CEO's approval through Claude Code's own prompt**: `git push`, `gh repo create`, `gh pr merge`, releases, and writing files into a product's main checkout. A script would hide those commands from the permission rules in `.claude/settings.json`. `worktree.py merge` into a product repo insists on `--approved-by-ceo` for the same reason: say it only when the CEO said yes.
+- **Anything that needs the CEO's approval through Claude Code's own prompt**: `git push`, `gh repo create`, `gh pr merge`, releases, and writing files into a product's main checkout (creating one with `init`, `clone` or `import-local` is the exception). A script would hide those commands from the permission rules in `.claude/settings.json`. `worktree.py merge` into a product repo insists on `--approved-by-ceo` for the same reason: say it only when the CEO said yes.
 - **Judgment**: writing briefs, plans, specs and reviews, deciding what to resume or drop, deciding what goes into a `CLAUDE.md`. Scripts gather the facts for those decisions.
 - **Project-specific commands**: install, test, run. They live in each project's `CLAUDE.md`.
 

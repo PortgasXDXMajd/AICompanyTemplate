@@ -1,6 +1,6 @@
 # Team
 
-Who works here and what each one owns. The Chief of Staff routes work using this table, so keep it current. Updated by the `hire` skill, and by `new-project`, which adds the Senior Technical Adviser with the first software project. Only employees whose role file exists in `.claude/agents/` are listed.
+Who works here and what each one owns. The Chief of Staff routes work using this table, so keep it current. Updated by the `hire` skill, and by `new-project` or `import-project`, which add the Senior Technical Adviser with the first software project. Only employees whose role file exists in `.claude/agents/` are listed.
 
 | Name | Type | Owns | How to reach |
 | --- | --- | --- | --- |

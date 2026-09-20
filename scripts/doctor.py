@@ -25,7 +25,8 @@ BUDGETS_WORDS = [("CLAUDE.md", 1800), ("context/engineering.md", 700)]
 ON_DEMAND = ("CONTEXT.md", "docs/adr/", "work/", "routines/reviews/", ".claude/agent-memory/", "FINDINGS.md",
              "references/", "worktrees/_hq", ".maestro/", "handback.md", "progress.md", "brief.md", "review.md",
              "quality.md", "architecture.md", "qa.md", "handoff.md", "closed.md", "review-2.md", "qa-2.md",
-             "quality-2.md", "resume-", "fix-", "qa/", ".claude/agents/senior-technical-adviser.md", "BOARD.md", "MEMORY.md")
+             "quality-2.md", "resume-", "fix-", "qa/", ".claude/agents/senior-technical-adviser.md", "BOARD.md", "MEMORY.md",
+             "PROFILE.md", "survey.md", "baseline.md", "AGENTS.md")
 
 
 def vendored():
@@ -134,7 +135,9 @@ def check_settings(problems):
 
 
 def check_budgets(problems, report):
-    items = list(BUDGETS_WORDS) + [(L.rel(p), 800) for p in sorted((R / "projects").glob("*/CLAUDE.md"))]
+    # an imported codebase (it has a profile) also records its conventions in its CLAUDE.md, so it gets more room
+    items = list(BUDGETS_WORDS) + [(L.rel(p), 1200 if (R / "plans" / p.parent.name / "PROFILE.md").exists() else 800)
+                                   for p in sorted((R / "projects").glob("*/CLAUDE.md"))]
     for relp, budget in items:
         p = R / relp
         if p.exists():

@@ -2,9 +2,11 @@
 
 STATUS: DEFAULTS
 
-<!-- The rules everyone who writes code follows on every project. The first software project set up with the new-project skill grills the CEO on "House style" and sets the status to SET. Project-specific choices (tech stack, commands) live in each project's own CLAUDE.md, not here. -->
+<!-- The rules everyone who writes code follows on every project. The first software project (new-project or import-project skill) settles "House style" with the CEO and sets the status to SET. Project-specific choices (tech stack, commands) live in each project's own CLAUDE.md, not here. -->
 
 Anyone who writes code, employee or Chief of Staff, reads this file and the project's `CLAUDE.md` before starting. Both are binding.
+
+**Imported codebases keep their own standards.** A project with a `plans/<project>/PROFILE.md` existed before the company (`import-project` skill). There, new code looks like the code around it: on how code is written (rules 3, 4 and 6, commit message format, QA identifiers, House style, test style) the project wins, unless its `CLAUDE.md` records that the CEO decided otherwise. Company process always applies: rules 1, 2 and 8, no secrets, and the test-first order of rule 5, with the project's own test tools.
 
 ## Always
 

@@ -13,6 +13,8 @@ It is plain markdown plus native Claude Code features (`CLAUDE.md`, subagents, s
 
 Optional but recommended: install and authenticate the GitHub CLI (`gh auth login`) so `/new-project` can create product repos for you.
 
+**Already have code?** Say so during onboarding, or run `/import-project <GitHub repo, git URL or folder>` later. The company clones it under `projects/`, runs its tests to record a baseline, has the adviser profile it (stack, architecture, databases, services, how changes ship, and the standards the code actually follows), asks you only what the code cannot tell, and proposes a `CLAUDE.md` for it. From then on employees work on it like on any other project, and they follow its existing standards, not the company defaults.
+
 ## How it works
 
 **You talk to the Chief of Staff.** A normal `claude` session in this repo acts as Chief of Staff: it clarifies what you want, checks it against the roadmap, routes it to the employee who owns that work (or does it itself), gets it reviewed against `REVIEW.md`, and records the result.
@@ -52,8 +54,8 @@ routines/          Recurring procedures: daily standup, end of day, weekly revie
 projects/          Product repos, cloned here, tracked in their own GitHub repos
 worktrees/         One git worktree per running employee (gitignored)
 .claude/agents/    Employees
-.claude/skills/    Company procedures (onboard, hire, new-project, feature, delegate, worktree,
-                   job-status, refinement-check, qa-check, doctor, markdown), plus third-party skills
+.claude/skills/    Company procedures (onboard, hire, new-project, import-project, feature, delegate,
+                   worktree, job-status, refinement-check, qa-check, doctor, markdown), plus third-party skills
                    installed with `npx skills`
 scripts/           The deterministic plumbing the skills call (Python, standard library only)
 .markdownlint-cli2.jsonc  Markdown lint rules for VS Code, markdownlint-cli2 and scripts/mdfix.py
@@ -116,6 +118,7 @@ Everything here is Markdown, so it is kept clean under [markdownlint](https://gi
 | `/onboard` | Interview about product, buyer, pain, promise, goal. Sets up the company. |
 | `/hire <role>` | Justify, define, and create a new employee. |
 | `/new-project <name>` | Grill the tech stack, create a product repo on GitHub with a README and a `CLAUDE.md` recording that stack, clone it into `projects/`. |
+| `/import-project <repo or folder>` | Bring in a codebase that already exists: clone, baseline, profile in `plans/<name>/PROFILE.md`, questions for you, and a `CLAUDE.md` recording the stack and standards it already has. |
 | `/feature <idea>` | Grill a feature idea into an approved spec in `specs/`, have the adviser turn it into plans, and put it on the roadmap. |
 | `claude --agent senior-technical-adviser` | Work with the adviser directly, for example "audit projects/my-app". |
 | `/improve-codebase-architecture projects/<name>` | Full, interactive architecture review of one project. Always pass the project path. |
@@ -146,7 +149,7 @@ Eight third-party skills are vendored into `.claude/skills/` and pinned in `skil
 
 | Skill | Used for |
 | --- | --- |
-| `grilling` | The interview method behind `/onboard`, `/new-project` and `/feature` |
+| `grilling` | The interview method behind `/onboard`, `/new-project`, `/import-project` and `/feature` |
 | `tdd` | How every developer builds: test-first, in vertical slices |
 | `herdr` | The Herdr CLI reference behind `delegate`'s one-tab-per-employee mode |
 | `improve` | The Senior Technical Adviser's method: codebase audits and executor-ready plans |
@@ -167,7 +170,7 @@ npx skills add https://github.com/shadcn/improve --skill improve -a claude-code 
 npx skills add herdrdev/herdr --skill herdr -a claude-code --copy -y
 ```
 
-Update them with `python3 scripts/skills.py update` (`npx skills update`), and read the diff before committing: skills are instructions your employees will follow. Do not edit them in place. Company-specific behaviour goes in the wrapper skills (`onboard`, `new-project`, `feature`, `delegate`, `refinement-check`), so updates never clobber it.
+Update them with `python3 scripts/skills.py update` (`npx skills update`), and read the diff before committing: skills are instructions your employees will follow. Do not edit them in place. Company-specific behaviour goes in the wrapper skills (`onboard`, `new-project`, `import-project`, `feature`, `delegate`, `refinement-check`), so updates never clobber it.
 
 **The refinement check.** After every code implementation, and before any feature branch is pushed or merged, the Chief of Staff runs `refinement-check`: two fresh subagents review the change with the code quality and architecture skills. Inside Herdr those helpers are tabs too. Problems contained in the change are fixed on the branch. Wider ones are logged in `work/engineering/refinement-candidates.md` and brought to you.
 

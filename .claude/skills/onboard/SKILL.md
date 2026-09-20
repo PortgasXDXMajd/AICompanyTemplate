@@ -39,7 +39,7 @@ On top of the grilling method:
    - Test: one goal, a number, a date, within 2 to 12 weeks, matched to the stage. Before launch the goal is usually about learning or first customers, not revenue scale. Push back on goals that the constraints make unrealistic.
 6. **Stage and constraints.** Idea, building, or launched? Hours per week? Budget? Hard deadlines? Anything off the table (channels, technologies, markets)?
 7. **Existing assets.** Is there already a repo, a landing page, a waitlist, customers, an audience? Get URLs.
-8. **Projects.** Only if something the company makes lives in a repo (software, a site, a content repo). What is the first one called, and does it already exist on GitHub? A pure service business has no project: skip this, skip step 4 of "Write it down", and its deliverables go in `work/`.
+8. **Projects.** Only if something the company makes lives in a repo (software, a site, a content repo). What is the first one called, and does code for it already exist (on GitHub, or in a folder on this machine)? A pure service business has no project: skip this, skip step 4 of "Write it down", and its deliverables go in `work/`.
 
 ## Play it back
 
@@ -50,7 +50,7 @@ The grilling skill ends when the frontier is empty and the CEO confirms a shared
 1. Fill `context/company.md`. Replace the status line with `STATUS: ONBOARDED YYYY-MM-DD`. Keep the file under one page.
 2. Set **Current goal** in `ROADMAP.md`. That is the only place the goal is written, so it cannot drift. Draft **Now** with at most three items that move the goal, and put the rest in Next or Later. Before launch, at least one Now item should test the riskiest assumption with real buyers. Show the draft to the CEO and adjust.
 3. Add any customers or leads the CEO mentioned to `customers/`, one file each from `customers/_template.md`.
-4. If item 8 produced a project: set it up with the `new-project` skill, which grills the tech stack and the CEO's coding rules, and writes the project's `CLAUDE.md`. If the repo already exists, it clones it instead of creating one. When it finishes, come back here.
+4. If item 8 produced a project: when it starts from nothing, set it up with the `new-project` skill, which grills the tech stack and the CEO's coding rules, and writes the project's `CLAUDE.md`. When the code already exists, use the `import-project` skill instead: it reads the code, records the stack and the standards it already follows, and asks the CEO only what the code cannot tell. An import runs over more than one sitting and makes its own commits, so do step 5 first and start the import after it. When it finishes, come back here.
 5. Append the key choices to `context/decisions.md`, add a line to `context/log.md`, and commit with the message `Onboard company: <product name>`. Commit before hiring, so the hire is its own commit.
 6. Recommend the next hire. If a software project was created, the Senior Technical Adviser is already on the team, so this is usually the first developer: the one role whose recurring work the top Now item needs most. If the CEO already asked for a specific role, evaluate that one first. Explain the choice in two sentences. If the CEO agrees, run the `hire` skill. If no role passes the four tests in `hire`, say so and hire nobody: the Chief of Staff does the work until a role is justified. One hire is enough on day one.
 

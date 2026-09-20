@@ -69,6 +69,8 @@ Only after the work has passed `REVIEW.md`. A product repo merge needs the CEO's
 
 Pushing is a separate approval, and is not in the script on purpose: run `git push` yourself so Claude Code asks the CEO.
 
+**Projects that ship by pull request.** Some projects, usually imported ones with branch protection, CI on pull requests or other people in the repo, say under Delivery in their `CLAUDE.md` that changes ship by pull request. There you do not merge locally. After the CEO's yes, run `git -C <worktree> push -u origin <branch>` (or `<branch>:<a name their rules accept>` when the repo enforces branch names) and `gh pr create` yourself, so Claude Code asks; a pull request into a repo other people work in is also "sending something outside" (`CLAUDE.md`, approval list). Set the job to `awaiting-merge` with the next step `PR <url> open`, and leave the worktree in place for fix rounds from the review there. When the pull request is merged: `git -C projects/<name> pull --ff-only`, then `remove`. After a squash merge git cannot see that the branch was merged and refuses to delete it: use `remove --keep-branch`, and delete the branch only with the CEO's yes.
+
 ## remove
 
 After the merge. `remove` deletes the worktree and then the branch, and never forces either: git refuses to delete unmerged work or a worktree with modified or untracked files, and that refusal is the safety net. Never use `--force`, `branch -D` or `rm -rf` on a worktree without the CEO saying so; if a folder was deleted by hand, `git -C <repo> worktree prune` repairs the registration.

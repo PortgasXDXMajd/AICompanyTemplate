@@ -22,6 +22,7 @@
       "Bash(gh repo create *)",
       "Bash(gh repo delete *)",
       "Bash(gh repo edit *)",
+      "Bash(gh pr create *)",
       "Bash(gh pr merge *)",
       "Bash(gh release *)",
       "Edit(/projects/*/**)"

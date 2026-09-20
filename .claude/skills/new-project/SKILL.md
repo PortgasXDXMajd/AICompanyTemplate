@@ -1,7 +1,7 @@
 ---
 name: new-project
-description: Create a new product project for the company - grills the CEO on the tech stack, then creates a GitHub repo with a README and a CLAUDE.md recording that stack, cloned into projects/<name> and added to the registry in projects/README.md. Also use to register and clone a product repo that already exists. Use during onboarding and whenever the CEO wants to start a new product or codebase.
-argument-hint: <project-name or existing repo URL>
+description: Create a new product project for the company - grills the CEO on the tech stack, then creates a GitHub repo with a README and a CLAUDE.md recording that stack, cloned into projects/<name> and added to the registry in projects/README.md. Use during onboarding and whenever the CEO wants to start a new product or codebase from nothing. For code that already exists, use import-project instead.
+argument-hint: "<project-name>"
 ---
 
 # New project
@@ -20,11 +20,11 @@ Check the tools first: `gh --version` and `gh auth status`. Then get these, aski
 
 - **Name:** kebab-case, short, no spaces, not starting with an underscore (`worktrees/_hq/` is reserved). Check it is not already in the registry or present under `projects/`.
 - **Purpose:** one line. Take it from `context/company.md` when this is the main product.
-- **New or existing:** if the CEO gave a URL or says the repo exists, go to step 4.
+- **New or existing:** if the CEO gave a URL or a folder, or says the code already exists, this is the wrong skill: stop and run `import-project`, which reads the code and records the stack and standards it already has. One exception: a repo that exists but holds no code yet (a README at most). Clone it with `python3 scripts/project.py clone <owner>/<name>`, continue with step 2, and in step 3 skip `init` and `gh repo create`: write the two files, run `project.py commit <name>`, and push (Claude Code asks the CEO).
 - **Owner:** the GitHub user or org. Default to the account from `gh api user --jq .login`. If `gh` is unavailable, ask the CEO.
 - **Visibility:** `private` unless the CEO says `public`.
 
-## 2. Settle the tech stack (new repo only)
+## 2. Settle the tech stack
 
 The CEO chooses the stack. Your job is to make it a considered choice and to write it down where every future session will read it.
 
@@ -38,7 +38,7 @@ Call the Skill tool with "grilling" and follow it. The roots of the design tree 
 
 Close with one playback: name, owner, visibility, the filled stack table, and, if `.claude/agents/senior-technical-adviser.md` does not exist yet, that this adds the Senior Technical Adviser as the first employee (newest Fable model, maximum effort: the most capable and most expensive setting, used for understanding code and writing plans, never for implementing). Creating a repo and hiring need CEO approval, and one yes to this playback is the shared-understanding confirmation and both approvals. It covers the initial push.
 
-## 3. Create the repo (new repo only)
+## 3. Create the repo
 
 ```bash
 python3 scripts/project.py init <name>        # validates the name, creates projects/<name> as an empty repo on main
@@ -78,34 +78,20 @@ gh repo create <owner>/<name> --<visibility> --source projects/<name> --remote o
 
 When the CEO says it is done, verify with `git -C projects/<name> remote -v`, then run `project.py register` again with `--status active`.
 
-Then go to step 5.
+## 4. Make sure the Senior Technical Adviser exists (software projects only)
 
-## 4. Register an existing repo (existing repo only)
+If `.claude/agents/senior-technical-adviser.md` is missing, then with the CEO's yes from step 2, run `python3 scripts/team.py add-adviser`. It copies `senior-technical-adviser.md` (next to this file) there unchanged and adds the roster row. Do not lower its `model: fable` or `effort: max`: the CEO's standing rule is that the adviser always runs on the newest Fable model at maximum effort. Note the hire in `context/decisions.md`. Claude Code picks up the new file within a few seconds. One adviser serves every project, so skip this step if the file is already there.
 
-```bash
-python3 scripts/project.py clone <owner>/<name or URL> [<name>]    # uses gh, falls back to git clone
-```
-
-Read its README and its `CLAUDE.md` if present, so the purpose line in the registry is accurate.
-
-If it has no `CLAUDE.md`, or the one it has does not state the tech stack: work the stack out from the code yourself (manifests, lockfiles, config) and fill in `project-claude-template.md`, including Commands and Structure from what is actually there. Replace "Decided by the CEO on" with "Recorded from the existing code on YYYY-MM-DD, confirmed by the CEO". Ask the CEO only about what the code cannot tell you. Write and commit the file in a worktree `worktrees/<name>/chief-of-staff--add-claude-md` (`worktree` skill), show it to the CEO, and ask for the merge in the same message, recommending yes. Until it is merged, write `CLAUDE.md pending merge` in the registry row, and point anyone who needs the file at that worktree. Change nothing else in the repo.
-
-Before step 5, two things the new-repo path covers in step 2: if `.claude/agents/senior-technical-adviser.md` does not exist, tell the CEO this project adds the Senior Technical Adviser as the first employee (newest Fable model, maximum effort: the most expensive setting; it plans, it never implements) and get an explicit yes. And if `context/engineering.md` says `STATUS: DEFAULTS`, run the House style branch of step 2 now.
-
-## 5. Make sure the Senior Technical Adviser exists (software projects only)
-
-If `.claude/agents/senior-technical-adviser.md` is missing, then with the CEO's yes from step 2 or step 4, run `python3 scripts/team.py add-adviser`. It copies `senior-technical-adviser.md` (next to this file) there unchanged and adds the roster row. Do not lower its `model: fable` or `effort: max`: the CEO's standing rule is that the adviser always runs on the newest Fable model at maximum effort. Note the hire in `context/decisions.md`. Claude Code picks up the new file within a few seconds. One adviser serves every project, so skip this step if the file is already there.
-
-## 6. Record it
+## 5. Record it
 
 1. Add or update the registry row: `python3 scripts/project.py register <name> --repo <owner>/<name> --purpose "<one line>" --status <active|local only|paused|archived>`.
 2. If this is the main product, mention it under Product in `context/company.md`.
 3. Note it in the journal: `python3 scripts/journal.py add "project <name> set up"`.
 4. Commit the HQ files you changed, by path, with the message `Add project <name>`: `projects/README.md`, `context/log.md`, and `context/company.md`, `context/engineering.md`, `context/team.md`, `context/decisions.md` or `.claude/agents/senior-technical-adviser.md` if touched. During onboarding, skip this commit: onboarding commits everything at the end.
 
-## 7. Put the adviser to work
+## 6. Put the adviser to work
 
-- **Existing repo with code:** recommend an audit to the CEO and say what it costs: the adviser is the expensive model. On a yes, first make the project readable, because the adviser may not install anything: main checkout on the default branch, clean, pulled, dependencies installed with the project's install command. Then, with the `delegate` skill (the adviser gets an HQ worktree), delegate to `senior-technical-adviser` with a brief: audit `projects/<name>` at `standard` depth. It returns a findings table; merge its branch into HQ, bring the table to the CEO, get their selection, and delegate again for the plans. The CEO can instead run it interactively with `claude --agent senior-technical-adviser`.
+- **A codebase with code in it** (it came in through `import-project`, which sends you here for the audit): recommend an audit to the CEO and say what it costs: the adviser is the expensive model. On a yes, first make the project readable, because the adviser may not install anything: main checkout on the default branch, clean, pulled, dependencies installed with the project's install command. Then, with the `delegate` skill (the adviser gets an HQ worktree), delegate to `senior-technical-adviser` with a brief: audit `projects/<name>` at `standard` depth, starting from `plans/<name>/PROFILE.md` and the import baseline when they exist. It returns a findings table; merge its branch into HQ, bring the table to the CEO, get their selection, and delegate again for the plans. The CEO can instead run it interactively with `claude --agent senior-technical-adviser`.
 - **New, empty repo:** there is nothing to audit. The adviser's first job comes when the first spec is approved (`feature` skill): it turns the spec into plans.
 
 If `senior-technical-adviser` cannot be delegated to yet, do not substitute a general-purpose subagent: ask the CEO to restart `claude`.

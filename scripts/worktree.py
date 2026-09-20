@@ -150,7 +150,12 @@ def cmd_merge(a):
               f"and the change is reviewed again. (--allow-behind skips this check when the files do not overlap.)")
     code, o, e = git(main, "merge", "--no-ff", branch, "-m", f"Merge {branch}: {a.title}")
     if code != 0:
+        _, unmerged, _ = git(main, "diff", "--name-only", "--diff-filter=U")
         git(main, "merge", "--abort")
+        if not unmerged:
+            L.die(f"the merge was refused, and not by a conflict: most likely a commit hook of the project (commitlint, "
+                  f"pre-commit) rejected the merge commit. Aborted, the main checkout is untouched. Show the CEO the output; "
+                  f"a project like this usually ships by pull request (worktree skill).\n{o}\n{e}")
         L.die(f"merge conflict; aborted, the main checkout is untouched. Send the branch back to be updated "
               f"(worktree.py update) and reviewed again.\n{o}\n{e}")
     _, sha, _ = git(main, "rev-parse", "--short", "HEAD")
