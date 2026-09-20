@@ -1,0 +1,13 @@
+# Product repos are cloned into projects/ but tracked in their own GitHub repos
+/projects/*
+!/projects/README.md
+
+# Local-only Claude Code state
+.claude/settings.local.json
+.claude/agent-memory-local/
+
+# Secrets and OS noise
+.env
+.env.*
+!.env.example
+.DS_Store
